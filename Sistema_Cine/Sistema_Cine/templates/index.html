@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinemanía - Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <h1>
+            <i class="fa-solid fa-clapperboard"></i>
+            Cinemanía
+        </h1>
+
+        <div class="user-info">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ usuario.nombre }}</span> ({{ usuario.cargo }})
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Cerrar Sesión
+        </a>
+    </nav>
+
+    <div class="container">
+        <div class="sidebar">
+            <a href="{{ url_for('dashboard') }}" class="active">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+
+            <a href="{{ url_for('clientes') }}">
+                <i class="fa-solid fa-users"></i> Clientes
+            </a>
+
+            <a href="{{ url_for('productos') }}">
+                <i class="fa-solid fa-box"></i> Productos
+            </a>
+
+            <a href="{{ url_for('funciones') }}">
+                <i class="fa-solid fa-film"></i> Funciones
+            </a>
+
+            <a href="{{ url_for('ventas') }}">
+                <i class="fa-solid fa-chart-line"></i> Ventas
+            </a>
+
+            <a href="{{ url_for('empleados') }}">
+                <i class="fa-solid fa-user-tie"></i> Empleados
+            </a>
+
+            <a href="{{ url_for('reportes') }}">
+                <i class="fa-solid fa-file-lines"></i> Reportes
+            </a>
+        </div>
+
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="welcome">
+                <h2>¡Bienvenido!</h2>
+                <p>Aquí tienes un resumen de la actividad del cine.</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="icon-card">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="number">{{ total_clientes }}</div>
+                    <div class="label">Clientes</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon-card">
+                        <i class="fa-solid fa-film"></i>
+                    </div>
+                    <div class="number">{{ total_peliculas }}</div>
+                    <div class="label">Películas</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon-card">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div class="number">{{ total_ventas }}</div>
+                    <div class="label">Ventas</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon-card">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <div class="number">${{ "%.2f"|format(total_ingresos) }}</div>
+                    <div class="label">Ingresos Totales</div>
+                </div>
+            </div>
+
+            <div class="banner-dashboard">
+                <div class="banner-info">
+                    <p>EN CARTELERA</p>
+                    <h3>Backrooms</h3>
+                    <span>Solo en cines</span>
+                    <br>
+                    <a href="{{ url_for('funciones') }}" class="btn btn-primary">Ver funciones</a>
+                </div>
+            </div>
+
+            <div class="peliculas-slider">
+                <div class="slider-header">
+                    <h3>
+                        <i class="fa-solid fa-film"></i>
+                        Películas disponibles
+                    </h3>
+                    <a href="{{ url_for('funciones') }}">Ver todas</a>
+                </div>
+
+                <div class="slider-track">
+                    <div class="pelicula-card" style="background-image: url('/static/img/backrooms.jpg');">
+                        <span>Backrooms</span>
+                    </div>
+
+                    <div class="pelicula-card" style="background-image: url('/static/img/michael.jpg');">
+                        <span>Michael</span>
+                    </div>
+
+                    <div class="pelicula-card" style="background-image: url('/static/img/toystory5.jpg');">
+                        <span>Toy Story 5</span>
+                    </div>
+
+                    <div class="pelicula-card" style="background-image: url('/static/img/scarymovie.jpg');">
+                        <span>Scary Movie</span>
+                    </div>
+
+                    <div class="pelicula-card" style="background-image: url('/static/img/supergirl.jpg');">
+                        <span>Supergirl</span>
+                    </div>
+
+                    <div class="pelicula-card" style="background-image: url('/static/img/revelacion.jpg');">
+                        <span>El Día de la Revelación</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3>
+                        <i class="fa-solid fa-chart-line"></i>
+                        Ventas recientes
+                    </h3>
+                    <p>Consulta el historial de las últimas ventas registradas.</p>
+                    <a href="{{ url_for('ventas') }}" class="btn btn-secondary">Ver ventas</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>
+                        <i class="fa-solid fa-calendar-days"></i>
+                        Funciones próximas
+                    </h3>
+                    <p>Revisa las funciones disponibles y horarios del cine.</p>
+                    <a href="{{ url_for('funciones') }}" class="btn btn-secondary">Ver funciones</a>
+                </div>
+            </div>
+
+            <div class="footer">
+                © 2026 <span>CINEMANÍA</span> - Sistema de Gestión Cinematográfica
+            </div>
+        </main>
+    </div>
+</body>
+</html>

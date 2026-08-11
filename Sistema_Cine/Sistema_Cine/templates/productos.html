@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>
+            <i class="fa-solid fa-clapperboard"></i>
+            Cinemanía
+        </h1>
+
+        <div class="user-info">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ usuario.nombre }}</span> ({{ usuario.cargo }})
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Cerrar Sesión
+        </a>
+    </nav>
+    
+   <div class="container">
+        <div class="sidebar">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+            <a href="{{ url_for('clientes') }}">
+                <i class="fa-solid fa-users"></i> Clientes
+            </a>
+            <a href="{{ url_for('productos') }}"class="active">
+                <i class="fa-solid fa-box"></i> Productos
+            </a>
+            <a href="{{ url_for('funciones') }}">
+                <i class="fa-solid fa-film"></i> Funciones
+            </a>
+            <a href="{{ url_for('ventas') }}">
+                <i class="fa-solid fa-chart-line"></i> Ventas
+            </a>
+            <a href="{{ url_for('empleados') }}">
+                <i class="fa-solid fa-user-tie"></i> Empleados
+            </a>
+            <a href="{{ url_for('reportes') }}">
+                <i class="fa-solid fa-file-lines"></i> Reportes
+            </a>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <h2><i class="fa-solid fa-box"></i> Gestión de Productos </h2>
+            
+            <div class="toolbar">
+                <a href="{{ url_for('producto_nuevo') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nuevo Producto </a>
+                <a href="{{ url_for('productos') }}" class="btn btn-info"><i class="fa-solid fa-rotate"></i> Actualizar </a>
+            </div>
+            
+            {% if productos %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in productos %}
+                        <tr>
+                            <td>{{ prod[0] }}</td>
+                            <td>{{ prod[1] }}</td>
+                            <td>
+                                <span class="badge badge-{{ prod[2] }}">
+                                    {{ prod[2]|capitalize }}
+                                </span>
+                            </td>
+                            <td>${{ "%.2f"|format(prod[3]) }}</td>
+                            <td>{{ prod[4] }}</td>
+                            <td class="actions">
+                                <a href="{{ url_for('producto_editar', id=prod[0]) }}" class="edit"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{{ url_for('producto_eliminar', id=prod[0]) }}" class="delete" onclick="return confirm('¿Eliminar este producto?')"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty">No hay productos registrados</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinemanía - Iniciar Sesión</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: #1a1a2e; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-container {
+            background: #16213e;
+            padding: 50px;
+            border-radius: 15px;
+            width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .login-container h1 { text-align: center; color: #e94560; font-size: 32px; margin-bottom: 10px; }
+        .login-container .subtitle { text-align: center; color: #aaa; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: #fff; margin-bottom: 5px; }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 14px;
+        }
+        .form-group input:focus { outline: none; border-color: #e94560; }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #e94560;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-login:hover { background: #c0392b; }
+        .flash-messages { margin-bottom: 15px; }
+        .flash-message { padding: 10px; border-radius: 5px; margin-bottom: 5px; text-align: center; }
+        .flash-message.success { background: #27ae60; color: #fff; }
+        .flash-message.danger { background: #e74c3c; color: #fff; }
+        .flash-message.warning { background: #f39c12; color: #fff; }
+        .flash-message.info { background: #3498db; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🎬 CINEMANÍA</h1>
+        <p class="subtitle">Sistema de Gestión</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" name="usuario" placeholder="Ingrese su usuario" required>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="contrasena" placeholder="Ingrese su contraseña" required>
+            </div>
+            <button type="submit" class="btn-login">Ingresar</button>
+        </form>
+    </div>
+</body>
+</html>

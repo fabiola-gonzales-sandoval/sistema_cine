@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>
+            <i class="fa-solid fa-clapperboard"></i>
+            Cinemanía
+        </h1>
+
+        <div class="user-info">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ usuario.nombre }}</span> ({{ usuario.cargo }})
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Cerrar Sesión
+        </a>
+    </nav>
+    
+    <div class="container">
+        <div class="sidebar">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+            <a href="{{ url_for('clientes') }}">
+                <i class="fa-solid fa-users"></i> Clientes
+            </a>
+            <a href="{{ url_for('productos') }}">
+                <i class="fa-solid fa-box"></i> Productos
+            </a>
+            <a href="{{ url_for('funciones') }}">
+                <i class="fa-solid fa-film"></i> Funciones
+            </a>
+            <a href="{{ url_for('ventas') }}">
+                <i class="fa-solid fa-chart-line"></i> Ventas
+            </a>
+            <a href="{{ url_for('empleados') }}" class="active">
+                <i class="fa-solid fa-user-tie"></i> Empleados
+            </a>
+            <a href="{{ url_for('reportes') }}">
+                <i class="fa-solid fa-file-lines"></i> Reportes
+            </a>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <h2><i class="fa-solid fa-user-tie"></i> Gestión de Empleados </h2>
+            
+            <div class="toolbar">
+                <a href="{{ url_for('empleado_nuevo') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nuevo Empleado </a>
+                <a href="{{ url_for('empleados') }}" class="btn btn-info"><i class="fa-solid fa-rotate"></i> Actualizar </a>
+            </div>
+            
+            {% if empleados %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Cargo</th>
+                            <th>Usuario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in empleados %}
+                        <tr>
+                            <td>{{ e[0] }}</td>
+                            <td>{{ e[1] }}</td>
+                            <td>
+                                <span class="badge badge-{{ e[2] }}">
+                                    {{ e[2]|replace('_', ' ')|title }}
+                                </span>
+                            </td>
+                            <td>{{ e[3] }}</td>
+                            <td class="actions">
+                                <a href="{{ url_for('empleado_editar', id=e[0]) }}"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{{ url_for('empleado_eliminar', id=e[0]) }}" onclick="return confirm('¿Eliminar?')"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty">No hay empleados registrados</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

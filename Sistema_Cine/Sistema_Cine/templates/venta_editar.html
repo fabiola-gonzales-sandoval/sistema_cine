@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>
+            <i class="fa-solid fa-clapperboard"></i>
+            Cinemanía
+        </h1>
+
+        <div class="user-info">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ usuario.nombre }}</span> ({{ usuario.cargo }})
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Cerrar Sesión
+        </a>
+    </nav>
+    
+    <div class="container">
+        <div class="sidebar">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+            <a href="{{ url_for('clientes') }}">
+                <i class="fa-solid fa-users"></i> Clientes
+            </a>
+            <a href="{{ url_for('productos') }}">
+                <i class="fa-solid fa-box"></i> Productos
+            </a>
+            <a href="{{ url_for('funciones') }}">
+                <i class="fa-solid fa-film"></i> Funciones
+            </a>
+            <a href="{{ url_for('ventas') }}" class="active">
+                <i class="fa-solid fa-chart-line"></i> Ventas
+            </a>
+            <a href="{{ url_for('empleados') }}">
+                <i class="fa-solid fa-user-tie"></i> Empleados
+            </a>
+            <a href="{{ url_for('reportes') }}">
+                <i class="fa-solid fa-file-lines"></i> Reportes
+            </a>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <h2><i class="fa-solid fa-pen"></i> Editar Venta #{{ venta[0] }}</h2>
+            
+            <div class="info-box">
+                <strong>ID de Venta:</strong> {{ venta[0] }} | 
+                <strong>Fecha:</strong> {{ venta[2] }}
+            </div>
+            
+            <div class="form-container">
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Cliente</label>
+                        <select name="id_cliente">
+                            <option value="">Sin cliente</option>
+                            {% for c in clientes %}
+                            <option value="{{ c[0] }}" {% if venta[4] == c[0] %}selected{% endif %}>
+                                {{ c[1] }} {{ c[2] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Empleado *</label>
+                        <select name="id_empleado" required>
+                            <option value="">Seleccionar...</option>
+                            {% for e in empleados %}
+                            <option value="{{ e[0] }}" {% if venta[5] == e[0] %}selected{% endif %}>
+                                {{ e[1] }} ({{ e[2] }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Entrada *</label>
+                        <select name="id_entrada" required>
+                            <option value="">Seleccionar...</option>
+                            {% for e in entradas %}
+                            <option value="{{ e[0] }}" {% if venta[6] == e[0] %}selected{% endif %}>
+                                {{ e[1] }} - Sala {{ e[2] }} - {{ e[3] }} {{ e[4] }} - Asiento {{ e[6] }} - ${{ "%.2f"|format(e[5]) }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Método de Pago *</label>
+                        <select name="metodo_pago" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="efectivo" {% if venta[1] == 'efectivo' %}selected{% endif %}> Efectivo</option>
+                            <option value="tarjeta" {% if venta[1] == 'tarjeta' %}selected{% endif %}> Tarjeta</option>
+                            <option value="qr" {% if venta[1] == 'qr' %}selected{% endif %}> QR</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Total *</label>
+                        <input type="number" step="0.01" name="total" value="{{ venta[3] }}" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Actualizar Venta</button>
+                        <a href="{{ url_for('ventas') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
