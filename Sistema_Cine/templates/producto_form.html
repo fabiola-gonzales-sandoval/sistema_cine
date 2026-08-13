@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>
+            <i class="fa-solid fa-clapperboard"></i>
+            Cinemanía
+        </h1>
+
+        <div class="user-info">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ usuario.nombre }}</span> ({{ usuario.cargo }})
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Cerrar Sesión
+        </a>
+    </nav>
+    
+    <div class="container">
+        <div class="sidebar">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+            <a href="{{ url_for('clientes') }}">
+                <i class="fa-solid fa-users"></i> Clientes
+            </a>
+            <a href="{{ url_for('productos') }}" class="active">
+                <i class="fa-solid fa-box"></i> Productos
+            </a>
+            <a href="{{ url_for('funciones') }}">
+                <i class="fa-solid fa-film"></i> Funciones
+            </a>
+            <a href="{{ url_for('ventas') }}">
+                <i class="fa-solid fa-chart-line"></i> Ventas
+            </a>
+            <a href="{{ url_for('empleados') }}">
+                <i class="fa-solid fa-user-tie"></i> Empleados
+            </a>
+            <a href="{{ url_for('reportes') }}">
+                <i class="fa-solid fa-file-lines"></i> Reportes
+            </a>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <h2>{% if producto %}<i class="fa-solid fa-pen"></i> Editar Producto {% else %}<i class="fa-solid fa-plus"></i> Nuevo Producto {% endif %}</h2>
+            
+            {% if producto %}
+            <div class="info-box">
+                <strong>ID del Producto:</strong> {{ producto[0] }}
+            </div>
+            {% endif %}
+            
+            <div class="form-container">
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" name="nombre_producto" value="{{ producto[1] if producto else '' }}" placeholder="Ej: Palomitas" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select name="categoria" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="alimento" {% if producto and producto[2] == 'alimento' %}selected{% endif %}>Alimento</option>
+                            <option value="bebida" {% if producto and producto[2] == 'bebida' %}selected{% endif %}>Bebida</option>
+                            <option value="combo" {% if producto and producto[2] == 'combo' %}selected{% endif %}>Combo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio *</label>
+                        <input type="number" step="0.01" name="precio" value="{{ producto[3] if producto else '' }}" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock *</label>
+                        <input type="number" name="stock" value="{{ producto[4] if producto else '' }}" placeholder="0" required>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary btn-accion">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Guardar
+                        </button>
+                        <a href="{{ url_for('clientes') }}"
+                        class="btn btn-secondary btn-accion">
+                        <i class="fa-solid fa-xmark"></i>
+                        Cancelar </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

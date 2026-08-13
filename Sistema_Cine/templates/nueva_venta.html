@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <h1>
+            <i class="fa-solid fa-clapperboard"></i>
+            Cinemanía
+        </h1>
+
+        <div class="user-info">
+            <i class="fa-solid fa-user"></i>
+            <span>{{ usuario.nombre }}</span> ({{ usuario.cargo }})
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Cerrar Sesión
+        </a>
+    </nav>
+    
+    <div class="container">
+        <div class="sidebar">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-house"></i> Inicio
+            </a>
+            <a href="{{ url_for('clientes') }}">
+                <i class="fa-solid fa-users"></i> Clientes
+            </a>
+            <a href="{{ url_for('productos') }}">
+                <i class="fa-solid fa-box"></i> Productos
+            </a>
+            <a href="{{ url_for('funciones') }}">
+                <i class="fa-solid fa-film"></i> Funciones
+            </a>
+            <a href="{{ url_for('ventas') }}" class="active">
+                <i class="fa-solid fa-chart-line"></i> Ventas
+            </a>
+            <a href="{{ url_for('empleados') }}">
+                <i class="fa-solid fa-user-tie"></i> Empleados
+            </a>
+            <a href="{{ url_for('reportes') }}">
+                <i class="fa-solid fa-file-lines"></i> Reportes
+            </a>
+        </div>
+        
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <h2><i class="fa-solid fa-file-lines"></i> Registrar Nueva Venta </h2>
+            
+            <div class="form-container">
+                <form method="POST" id="ventaForm">
+                    <!-- Cliente -->
+                    <div class="form-group">
+                        <label>Cliente <span class="required">*</span></label>
+                        <select name="id_cliente" id="id_cliente" required>
+                            <option value="">Sin cliente</option>
+                            {% for c in clientes %}
+                            <option value="{{ c[0] }}">{{ c[1] }} {{ c[2] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Empleado -->
+                    <div class="form-group">
+                        <label>Empleado <span class="required">*</span></label>
+                        <select name="id_empleado" id="id_empleado" required>
+                            <option value="">Seleccionar...</option>
+                            {% for e in empleados %}
+                            <option value="{{ e[0] }}">{{ e[1] }} ({{ e[2] }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    
+                    <div class="form-group">
+                        <label>Entrada (Función) <span class="required">*</span></label>
+                        <select name="id_entrada" id="id_entrada" required onchange="calcularTotal()">
+                            <option value="">Seleccionar función...</option>
+                            {% for e in entradas %}
+                                <option value="{{ e[0] }}" data-precio="{{ e[5] }}">
+                                {{ e[1] }} | Sala {{ e[2] }} | {{ e[3] }} {{ e[4] }} | Asiento {{ e[6] }} | ${{ "%.2f"|format(e[5]) }} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+            
+                    <!-- Método de Pago -->
+                    <div class="form-group">
+                        <label>Método de Pago <span class="required">*</span></label>
+                        <select name="metodo_pago" id="metodo_pago" required>
+                            <option value="">Seleccionar método de pago...</option>
+                            <option value="efectivo"> Efectivo</option>
+                            <option value="tarjeta"> Tarjeta</option>
+                            <option value="qr"> QR</option>
+                        </select>
+                    </div>
+                        <!-- Productos -->
+                    <div class="form-group productos">
+                        <label>Productos Adicionales</label>
+                        <div id="productos-container">
+                            <div class="producto-row" id="producto-row-template" style="display:none;">
+                                <select class="producto-select" name="producto_id[]">
+                                    <option value="">Seleccionar producto...</option>
+                                </select>
+                                <input type="number" class="producto-cantidad" name="producto_cantidad[]" value="1" min="1">
+                                <span class="precio-producto">$0.00</span>
+                                <button type="button" class="btn-remove" onclick="eliminarProducto(this)">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                                <div class="stock-alert" style="display:none;">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    Stock insuficiente
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-add-producto" onclick="agregarProducto()">
+                            <i class="fa-solid fa-plus"></i>
+                            Agregar producto
+                        </button>
+                    </div>
+                    
+                    <!-- Desglose de la Venta -->
+                    <div class="desglose-box">
+                        <div class="desglose-row">
+                            <span class="label"> Entrada:</span>
+                            <span class="valor valor-entrada" id="desgloseEntrada">$0.00</span>
+                        </div>
+                        <div class="desglose-row">
+                            <span class="label"> Productos:</span>
+                            <span class="valor valor-productos" id="desgloseProductos">$0.00</span>
+                        </div>
+                        <div class="desglose-divider"></div>
+                        <div class="desglose-total">
+                            <span class="label"> TOTAL:</span>
+                            <span class="valor" id="desgloseTotal">$0.00</span>
+                        </div>
+                        <input type="hidden" name="total" id="totalInput" value="0">
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary btn-accion">
+                            Registrar
+                        </button>
+                        <a href="{{ url_for('clientes') }}"
+                        class="btn btn-secondary btn-accion">
+                        Cancelar </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="productos-data" style="display:none;">
+        {% for p in productos %}
+        <span class="producto-item" data-id="{{ p[0] }}" data-nombre="{{ p[1] }}" data-precio="{{ p[3] }}" data-stock="{{ p[4] }}"></span>
+        {% endfor %}
+    </div>
+    
+    <script>
+        // Obtener datos de productos desde el HTML
+        var productosData = [];
+        var items = document.querySelectorAll('#productos-data .producto-item');
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            productosData.push({
+                id: parseInt(item.getAttribute('data-id')),
+                nombre: item.getAttribute('data-nombre'),
+                precio: parseFloat(item.getAttribute('data-precio')),
+                stock: parseInt(item.getAttribute('data-stock'))
+            });
+        }
+        
+        var contadorProductos = 0;
+        
+        // ✅ Función para verificar stock
+        function verificarStock(element) {
+            var row = element.closest('.producto-row');
+            var select = row.querySelector('.producto-select');
+            var cantidad = row.querySelector('.producto-cantidad');
+            var alertDiv = row.querySelector('.stock-alert');
+            
+            if (!select || !select.value) {
+                row.classList.remove('stock-error');
+                if (alertDiv) alertDiv.classList.remove('show');
+                return true;
+            }
+            
+            var id_producto = parseInt(select.value);
+            var cantidad_requerida = parseInt(cantidad.value) || 1;
+            
+            // Buscar el producto en los datos
+            var producto = productosData.find(function(p) { return p.id === id_producto; });
+            
+            if (!producto) {
+                row.classList.remove('stock-error');
+                if (alertDiv) alertDiv.classList.remove('show');
+                return true;
+            }
+            
+            // ✅ VERIFICAR STOCK
+            if (producto.stock < cantidad_requerida) {
+                row.classList.add('stock-error');
+                if (alertDiv) {
+                    alertDiv.textContent = ' Stock insuficiente. Solo hay ' + producto.stock + ' unidades disponibles';
+                    alertDiv.classList.add('show');
+                }
+                return false;
+            } else {
+                row.classList.remove('stock-error');
+                if (alertDiv) alertDiv.classList.remove('show');
+                return true;
+            }
+        }
+        
+        // Función para agregar un producto
+        function agregarProducto() {
+            var container = document.getElementById('productos-container');
+            var template = document.getElementById('producto-row-template');
+            var newRow = template.cloneNode(true);
+            newRow.id = 'producto-' + contadorProductos;
+            newRow.style.display = 'flex';
+            newRow.classList.remove('stock-error');
+            
+            var select = newRow.querySelector('.producto-select');
+            select.id = 'prod-select-' + contadorProductos;
+            
+            var defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Seleccionar producto...';
+            select.appendChild(defaultOption);
+            
+            for (var i = 0; i < productosData.length; i++) {
+                var p = productosData[i];
+                var option = document.createElement('option');
+                option.value = p.id;
+                option.setAttribute('data-precio', p.precio);
+                option.setAttribute('data-stock', p.stock);
+                option.textContent = p.nombre + ' (Stock: ' + p.stock + ')';
+                select.appendChild(option);
+            }
+            
+            select.onchange = function() { 
+                actualizarPrecioProducto(this); 
+                verificarStock(this);
+                calcularTotal(); 
+            };
+            
+            var cantidad = newRow.querySelector('.producto-cantidad');
+            cantidad.id = 'prod-cant-' + contadorProductos;
+            cantidad.onchange = function() { 
+                verificarStock(this);
+                calcularTotal(); 
+            };
+            cantidad.oninput = function() { 
+                verificarStock(this);
+                calcularTotal(); 
+            };
+            
+            var btnRemove = newRow.querySelector('.btn-remove');
+            btnRemove.onclick = function() { 
+                eliminarProducto(this); 
+            };
+            
+            // Configurar alerta de stock
+            var alertDiv = newRow.querySelector('.stock-alert');
+            if (alertDiv) {
+                alertDiv.id = 'stock-alert-' + contadorProductos;
+            }
+            
+            container.appendChild(newRow);
+            contadorProductos++;
+            
+            actualizarPrecioProducto(select);
+            verificarStock(select);
+            calcularTotal();
+        }
+        
+        function eliminarProducto(btn) {
+            var row = btn.closest('.producto-row');
+            if (row && row.id !== 'producto-row-template') {
+                row.remove();
+                calcularTotal();
+            }
+        }
+        
+        function actualizarPrecioProducto(select) {
+            var row = select.closest('.producto-row');
+            var precioSpan = row.querySelector('.precio-producto');
+            var selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption && selectedOption.value) {
+                var precio = parseFloat(selectedOption.getAttribute('data-precio')) || 0;
+                precioSpan.textContent = '$' + precio.toFixed(2);
+            } else {
+                precioSpan.textContent = '$0.00';
+            }
+        }
+        
+        function calcularTotal() {
+            var totalEntrada = 0;
+            var totalProductos = 0;
+            var hayErrorStock = false;
+            
+            var entradaSelect = document.getElementById('id_entrada');
+            var selectedEntrada = entradaSelect.options[entradaSelect.selectedIndex];
+            if (selectedEntrada && selectedEntrada.value) {
+                totalEntrada = parseFloat(selectedEntrada.getAttribute('data-precio')) || 0;
+            }
+            
+            var rows = document.querySelectorAll('#productos-container .producto-row:not(#producto-row-template)');
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                var select = row.querySelector('.producto-select');
+                var cantidad = row.querySelector('.producto-cantidad');
+                
+                if (select && select.value) {
+                    var selectedOption = select.options[select.selectedIndex];
+                    var precioUnitario = parseFloat(selectedOption.getAttribute('data-precio')) || 0;
+                    var cant = parseInt(cantidad.value) || 1;
+                    totalProductos += precioUnitario * cant;
+                }
+                
+                // Verificar si hay error de stock en esta fila
+                if (row.classList.contains('stock-error')) {
+                    hayErrorStock = true;
+                }
+            }
+            
+            var totalGeneral = totalEntrada + totalProductos;
+            
+            document.getElementById('desgloseEntrada').textContent = '$' + totalEntrada.toFixed(2);
+            document.getElementById('desgloseProductos').textContent = '$' + totalProductos.toFixed(2);
+            document.getElementById('desgloseTotal').textContent = '$' + totalGeneral.toFixed(2);
+            document.getElementById('totalInput').value = totalGeneral.toFixed(2);
+            
+            // ✅ Deshabilitar botón si hay error de stock
+            var btnRegistrar = document.getElementById('btnRegistrar');
+            if (hayErrorStock) {
+                btnRegistrar.disabled = true;
+            } else {
+                btnRegistrar.disabled = false;
+            }
+        }
+        
+        // Validar antes de enviar
+        document.getElementById('ventaForm').onsubmit = function(e) {
+            var total = parseFloat(document.getElementById('totalInput').value) || 0;
+            if (total <= 0) {
+                alert(' El total debe ser mayor a 0. Selecciona una entrada o agrega productos.');
+                e.preventDefault();
+                return false;
+            }
+            
+            var cliente = document.getElementById('id_cliente').value;
+            if (!cliente) {
+                alert(' Selecciona un cliente.');
+                e.preventDefault();
+                return false;
+            }
+
+            var empleado = document.getElementById('id_empleado').value;
+            if (!empleado) {
+                alert(' Selecciona un empleado.');
+                e.preventDefault();
+                return false;
+            }
+            
+            var entrada = document.getElementById('id_entrada').value;
+            if (!entrada) {
+                alert(' Selecciona una entrada.');
+                e.preventDefault();
+                return false;
+            }
+            
+            var metodoPago = document.getElementById('metodo_pago').value;
+            if (!metodoPago) {
+                alert(' Selecciona un método de pago.');
+                e.preventDefault();
+                return false;
+            }
+            
+            //Verificar que no haya errores de stock
+            var rows = document.querySelectorAll('#productos-container .producto-row:not(#producto-row-template)');
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].classList.contains('stock-error')) {
+                    alert(' No se puede registrar la venta. Hay productos con stock insuficiente.');
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            
+            return true;
+        };
+        
+        // Inicializar: agregar un producto por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            agregarProducto();
+        });
+    </script>
+</body>
+</html>
