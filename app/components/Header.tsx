@@ -2,10 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Star, Search, Settings, Menu } from "lucide-react";
+
+const navItems = [
+  { label: "Inicio", href: "/dashboard" },
+  { label: "Películas", href: "/dashboard/projects" },
+  { label: "Productos", href: "/dashboard/tasks" },
+  { label: "Funciones", href: "/dashboard/shows" },
+  { label: "Ventas", href: "/dashboard/sales" },
+  { label: "Clientes", href: "/dashboard/users" },
+  { label: "Empleados", href: "/dashboard/employees" },
+  { label: "Reportes", href: "/dashboard/profile" },
+];
 
 export default function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-40 bg-[#070d24]/95 backdrop-blur border-b border-white/5">
@@ -35,14 +48,22 @@ export default function Header() {
 
           {/* Bloque Centro: Enlaces de navegación */}
           <nav className="hidden lg:flex items-center gap-4 text-sm text-gray-300 font-medium">
-            <Link href="/dashboard" className="bg-[#0b1739] text-yellow-400 px-3 py-1.5 rounded font-semibold">Inicio</Link>
-            <Link href="/dashboard/projects" className="hover:text-white transition-colors">Películas</Link>
-            <Link href="/dashboard/tasks" className="hover:text-white transition-colors">Productos</Link>
-            <Link href="/dashboard/shows" className="hover:text-white transition-colors">Funciones</Link>
-            <Link href="/dashboard/sales" className="hover:text-white transition-colors">Ventas</Link>
-            <Link href="/dashboard/users" className="hover:text-white transition-colors">Clientes</Link>
-            <Link href="/dashboard/employees" className="hover:text-white transition-colors">Empleados</Link>
-            <Link href="/dashboard/profile" className="hover:text-white transition-colors">Reportes</Link>
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-1.5 rounded transition-colors ${
+                    isActive
+                      ? "bg-[#0b1739] text-yellow-400 font-semibold"
+                      : "text-gray-300 hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Bloque Derecho: Buscador y Ajustes */}
@@ -77,14 +98,22 @@ export default function Header() {
         {/* Menú Mobile */}
         {mobileNavOpen && (
           <nav className="lg:hidden pb-4 flex flex-col gap-1 text-sm font-medium border-t border-white/5 pt-3">
-            <Link href="/dashboard" className="px-3 py-2 rounded-md bg-white/10 text-white">Inicio</Link>
-            <Link href="/dashboard/projects" className="px-3 py-2 rounded-md text-slate-300 hover:bg-white/5">Películas</Link>
-            <Link href="/dashboard/tasks" className="px-3 py-2 rounded-md text-slate-300 hover:bg-white/5">Productos</Link>
-            <Link href="/dashboard/shows" className="px-3 py-2 rounded-md text-slate-300 hover:bg-white/5">Funciones</Link>
-            <Link href="/dashboard/sales" className="px-3 py-2 rounded-md text-slate-300 hover:bg-white/5">Ventas</Link>
-            <Link href="/dashboard/users" className="px-3 py-2 rounded-md text-slate-300 hover:bg-white/5">Clientes</Link>
-            <Link href="/dashboard/employees" className="px-3 py-2 rounded-md text-slate-300 hover:bg-white/5">Empleados</Link>
-            <Link href="/dashboard/profile" className="px-3 py-2 rounded-md text-slate-300 hover:bg-white/5">Reportes</Link>
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-2 rounded-md transition-colors ${
+                    isActive
+                      ? "bg-white/10 text-yellow-400 font-semibold"
+                      : "text-slate-300 hover:bg-white/5"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         )}
       </div>
