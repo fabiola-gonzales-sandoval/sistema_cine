@@ -7,18 +7,25 @@ import { Star, Search, Settings, Menu } from "lucide-react";
 
 const navItems = [
   { label: "Inicio", href: "/dashboard" },
-  { label: "Películas", href: "/dashboard/projects" },
+  { label: "Películas", href: "/dashboard/movies" },
   { label: "Productos", href: "/dashboard/tasks" },
   { label: "Funciones", href: "/dashboard/shows" },
   { label: "Ventas", href: "/dashboard/sales" },
   { label: "Clientes", href: "/dashboard/users" },
   { label: "Empleados", href: "/dashboard/employees" },
-  { label: "Reportes", href: "/dashboard/profile" },
+  { label: "Reportes", href: "/dashboard/reports" },
 ];
 
 export default function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
+
+  const isLinkActive = (href: string) => {
+    if (pathname === href) return true;
+    if (href === "/dashboard/movies" && (pathname === "/dashboard/peliculas" || pathname === "/dashboard/projects")) return true;
+    if (href === "/dashboard/reports" && (pathname === "/dashboard/reportes" || pathname === "/dashboard/profile")) return true;
+    return false;
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-[#070d24]/95 backdrop-blur border-b border-white/5">
@@ -49,7 +56,7 @@ export default function Header() {
           {/* Bloque Centro: Enlaces de navegación */}
           <nav className="hidden lg:flex items-center gap-4 text-sm text-gray-300 font-medium">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isLinkActive(item.href);
               return (
                 <Link
                   key={item.href}
@@ -77,14 +84,6 @@ export default function Header() {
               />
             </label>
 
-            <Link
-              href="/dashboard/settings"
-              aria-label="Configuración"
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-slate-200"
-            >
-              <Settings className="w-4 h-4" />
-            </Link>
-
             <button
               type="button"
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
@@ -99,7 +98,7 @@ export default function Header() {
         {mobileNavOpen && (
           <nav className="lg:hidden pb-4 flex flex-col gap-1 text-sm font-medium border-t border-white/5 pt-3">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isLinkActive(item.href);
               return (
                 <Link
                   key={item.href}

@@ -16,44 +16,44 @@ export default function DashboardPage() {
     {
       title: "Backrooms",
       genre: "Terror / Suspenso",
-      rating: "PG-13",
+      rating: "14A",
       duration: "112 min",
-      image: "https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=600&auto=format&fit=crop",
+      image: "/img/backrooms.jpg",
     },
     {
       title: "Michael",
       genre: "Drama / Biografía",
-      rating: "PG",
+      rating: "ATP",
       duration: "128 min",
-      image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=600&auto=format&fit=crop",
+      image: "/img/michael.jpg",
     },
     {
       title: "Toy Story 5",
       genre: "Animación / Familiar",
-      rating: "G",
+      rating: "ATP",
       duration: "96 min",
-      image: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=600&auto=format&fit=crop",
+      image: "/img/toystory5.jpg",
     },
     {
       title: "Scary Movie",
       genre: "Comedia / Parodia",
-      rating: "R",
+      rating: "14A",
       duration: "102 min",
-      image: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=600&auto=format&fit=crop",
+      image: "/img/scarymovie.jpg",
     },
     {
       title: "Supergirl",
       genre: "Acción / Ciencia Ficción",
-      rating: "PG-13",
+      rating: "TBC",
       duration: "120 min",
-      image: "https://images.unsplash.com/photo-1547700055-b61cacebece9?q=80&w=600&auto=format&fit=crop",
+      image: "/img/supergirl.jpg",
     },
     {
       title: "El Día de la Revelación",
       genre: "Misterio / Drama",
-      rating: "PG-13",
+      rating: "TBC",
       duration: "140 min",
-      image: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop",
+      image: "/img/revelacion.jpg",
     },
   ];
 
@@ -105,8 +105,8 @@ export default function DashboardPage() {
         {/* Película Destacada (Hero Banner) */}
         <section className="relative rounded-2xl overflow-hidden border border-white/5 card-glow h-72 sm:h-80 md:h-96">
           <img
-            src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1600&auto=format&fit=crop"
-            alt="Backrooms"
+            src="/img/banner.jpg"
+            alt="Backrooms en Cartelera"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 hero-gradient"></div>
@@ -125,12 +125,12 @@ export default function DashboardPage() {
             <p className="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
               Nadie sabe cómo llegaron, pero todos saben que no hay salida. Descubre el laberinto infinito esta temporada.
             </p>
-            <button
-              type="button"
+            <Link
+              href="/dashboard/shows"
               className="mt-6 inline-flex items-center gap-2 bg-crimson-600 hover:bg-crimson-500 transition-colors text-white text-sm font-semibold px-5 py-2.5 rounded-lg w-fit cursor-pointer"
             >
               Ver Funciones <ArrowRight className="w-4 h-4" />
-            </button>
+            </Link>
           </div>
         </section>
 
