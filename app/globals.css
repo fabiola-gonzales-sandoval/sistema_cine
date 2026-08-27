@@ -1,26 +1,42 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --color-navy-950: #070d24;
+  --color-navy-900: #0b1230;
+  --color-navy-800: #101a3d;
+  --color-navy-700: #152150;
+  --color-navy-600: #1b2a63;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-gold-400: #f2c53d;
+  --color-gold-500: #eab308;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-crimson-500: #e53848;
+  --color-crimson-600: #d42b3c;
+
+  --font-display: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--color-navy-950);
+  color: #e2e8f0;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
+
+.card-glow {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+}
+
+.hero-gradient {
+  background: linear-gradient(
+    90deg,
+    rgba(7, 13, 36, 0.97) 0%,
+    rgba(7, 13, 36, 0.75) 40%,
+    rgba(7, 13, 36, 0.25) 75%,
+    rgba(7, 13, 36, 0.05) 100%
+  );
 }
