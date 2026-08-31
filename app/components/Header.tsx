@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Star, Search, Settings, Menu } from "lucide-react";
+import { Search, Menu, UserCircle, LogOut, ChevronDown } from "lucide-react";
 
 const navItems = [
   { label: "Inicio", href: "/dashboard" },
@@ -18,32 +18,48 @@ const navItems = [
 
 export default function Header() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const pathname = usePathname();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar el menú si se hace clic fuera de él
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const isLinkActive = (href: string) => {
     if (pathname === href) return true;
-    if (href === "/dashboard/movies" && (pathname === "/dashboard/peliculas" || pathname === "/dashboard/projects")) return true;
-    if (href === "/dashboard/reports" && (pathname === "/dashboard/reportes" || pathname === "/dashboard/profile")) return true;
     return false;
+  };
+
+  const handleLogout = () => {
+    // Aquí puedes agregar tu lógica de cierre de sesión (limpiar tokens, cookies, etc.)
+    window.location.href = "/"; // Redirige al login o inicio
   };
 
   return (
     <header className="sticky top-0 z-40 bg-[#070d24]/95 backdrop-blur border-b border-white/5">
-      {/* 2. Barra de navegación principal */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 gap-4">
-          {/* Bloque Izquierdo: Logo */}
+          
+          {/* Logo y Nombre */}
           <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
             <img
               src="/logo2.png"
-              alt="Logo Cinerama"
+              alt="Logo Cinemanía"
               className="h-9 w-auto object-contain"
             />
             <span className="font-bold text-yellow-400 tracking-wider text-xs sm:text-sm">CINEMANÍA</span>
           </Link>
 
-          {/* Bloque Centro: Enlaces de navegación */}
-          <nav className="hidden lg:flex items-center gap-4 text-sm text-gray-300 font-medium">
+          {/* Enlaces de navegación */}
+          <nav className="hidden lg:flex items-center gap-2 text-sm text-gray-300 font-medium">
             {navItems.map((item) => {
               const isActive = isLinkActive(item.href);
               return (
@@ -62,20 +78,53 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Bloque Derecho: Buscador y Ajustes */}
+          {/* Buscador y Perfil Interactivo */}
           <div className="flex items-center gap-3">
-            <label className="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 w-56 xl:w-72 focus-within:border-yellow-400/60 transition-colors">
+            <label className="hidden xl:flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 w-52 focus-within:border-yellow-400/60 transition-colors">
               <Search className="w-4 h-4 text-slate-400" />
               <input
                 type="search"
-                placeholder="Buscar película o ticket…"
+                placeholder="Buscar..."
                 className="bg-transparent outline-none text-sm placeholder:text-slate-500 w-full text-slate-200"
               />
             </label>
+
+            {/* **Menú Desplegable de Usuario** */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                <UserCircle className="w-6 h-6 text-yellow-400" />
+                <div className="hidden sm:block text-left">
+                  <p className="text-xs font-semibold text-white leading-tight">Admin Cine</p>
+                  <p className="text-[10px] text-yellow-400/80 leading-tight">Gerencia</p>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${userMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {/* Ventana Flotante / Dropdown */}
+              {userMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-[#0b1739] border border-white/10 rounded-xl shadow-2xl py-1.5 z-50">
+                  <div className="px-4 py-2 border-b border-white/5 sm:hidden">
+                    <p className="text-xs font-semibold text-white">Admin Cine</p>
+                    <p className="text-[10px] text-yellow-400">Gerencia</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Cerrar sesión
+                  </button>
+                </div>
+              )}
+            </div>
+
             <button
               type="button"
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-slate-200"
+              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-slate-200 cursor-pointer"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -102,7 +151,7 @@ export default function Header() {
               );
             })}
           </nav>
-          )}
+        )}
       </div>
     </header>
   );

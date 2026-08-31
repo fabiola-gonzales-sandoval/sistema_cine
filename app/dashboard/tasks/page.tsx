@@ -14,12 +14,14 @@ interface Producto {
 
 export default function ProductosPage() {
   const [busqueda, setBusqueda] = useState("");
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("Todos");
   const [productos, setProductos] = useState<Producto[]>([
     { id: 1, nombre: "Palomitas Grandes", categoria: "Alimento", precio: "$30.00", stock: 50 },
     { id: 2, nombre: "Refresco 32oz", categoria: "Bebida", precio: "$15.00", stock: 100 },
     { id: 3, nombre: "Nachos con Queso", categoria: "Alimento", precio: "$25.00", stock: 40 },
     { id: 4, nombre: "Combo Pareja (2 Refrescos + 1 Palomitas)", categoria: "Combo", precio: "$55.00", stock: 35 },
     { id: 5, nombre: "Hot Dog Clásico", categoria: "Alimento", precio: "$22.00", stock: 30 },
+    
   ]);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,14 +32,14 @@ export default function ProductosPage() {
     precio: "20.00",
     stock: 50,
   });
+  
 
   const productosFiltrados = productos.filter((p) => {
-    const q = busqueda.toLowerCase();
-    return (
-      p.nombre.toLowerCase().includes(q) ||
-      p.categoria.toLowerCase().includes(q)
-    );
-  });
+  const q = busqueda.toLowerCase();
+  const coincideTexto = p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q);
+  const coincideCategoria = categoriaSeleccionada === "Todos" || p.categoria === categoriaSeleccionada;
+  return coincideTexto && coincideCategoria;
+});
 
   const abrirModalNuevo = () => {
     setProductoEditar(null);
