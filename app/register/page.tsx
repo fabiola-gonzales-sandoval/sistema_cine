@@ -94,7 +94,7 @@ export default function RegisterPage() {
                   onClick={() => router.push("/login")}
                   style={{ marginTop: "12px", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", color: "#282415", fontWeight: "700" }}
                 >
-                  ¿Ya tienes cuenta? Inicia sesión aquí
+                  ¿ Ya tienes cuenta ? Inicia sesión aquí
                 </button>
               </div>
             </form>
